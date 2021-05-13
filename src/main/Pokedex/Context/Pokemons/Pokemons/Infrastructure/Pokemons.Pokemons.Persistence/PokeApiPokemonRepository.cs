@@ -44,7 +44,7 @@ namespace Pokemons.Pokemons.Persistence
                 new PokemonId(int.Parse(json["id"].ToString())),
                 new PokemonName(json["name"].ToString()),
                 new PokemonTypes(json["types"].Values("type").Select(x => new PokemonType(x["name"].ToString()))
-                    .ToList()), pokemonInMemory?.PokemonFavouriteCount ?? 0
+                    .ToList()), new PokemonFavouriteCount(pokemonInMemory?.PokemonFavouriteCount.Count ?? 0)
             );
         }
 
@@ -54,7 +54,7 @@ namespace Pokemons.Pokemons.Persistence
 
             var pokemon = await Find(pokemonId);
 
-            pokemon.PokemonFavouriteCount++;
+            pokemon.PokemonFavouriteCount.Count++;
 
             _memoryCache.Set(cacheKey, pokemon);
         }
