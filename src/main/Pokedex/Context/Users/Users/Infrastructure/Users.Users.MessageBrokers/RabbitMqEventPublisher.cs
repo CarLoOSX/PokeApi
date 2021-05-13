@@ -3,7 +3,7 @@ using System.Text;
 using RabbitMQ.Client;
 using Users.Users.Domain.Shared;
 
-namespace Users.Users.Persistence.Shared
+namespace Users.Users.MessageBrokers
 {
     public class RabbitMqEventPublisher : EventPublisher
     {
