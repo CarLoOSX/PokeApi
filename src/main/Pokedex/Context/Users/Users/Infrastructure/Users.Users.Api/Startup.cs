@@ -7,7 +7,9 @@ using Microsoft.OpenApi.Models;
 using Users.Users.Application.UseCase;
 using Users.Users.Domain.Repositories;
 using Users.Users.Domain.Services;
+using Users.Users.Domain.Shared;
 using Users.Users.Persistence;
+using Users.Users.Persistence.Shared;
 
 namespace Users.Users.Api
 {
@@ -72,6 +74,7 @@ namespace Users.Users.Api
         private void ConfigureRepositories(IServiceCollection services)
         {
             services.AddScoped<UserRepository, InMemoryUserRepository>();
+            services.AddScoped<EventPublisher, RabbitMqEventPublisher>();
         }
 
         private void ConfigureCache(IServiceCollection services)

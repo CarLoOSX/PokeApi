@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -26,13 +27,15 @@ namespace Pokemons.Pokemons.Api
             ConfigureUseCases(services);
             ConfigureDomainServices(services);
             ConfigureRepositories(services);
-
+            ConfigureCache(services);
+            ConfigureRabbitServices(services);
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Pokemons.Details.Api", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo {Title = "Pokemons.Details.Api", Version = "v1"});
             });
         }
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -50,25 +53,35 @@ namespace Pokemons.Pokemons.Api
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+
+            app.UseRabbitListeners();
         }
 
         private void ConfigureUseCases(IServiceCollection services)
         {
-            services.AddScoped<GetPokemonById>();
+            services.AddSingleton<GetPokemonById>();
+            services.AddSingleton<PokemonAddedToFavouritesNotifier>();
         }
 
         private void ConfigureDomainServices(IServiceCollection services)
         {
-            services.AddScoped<PokemonFinder>();
+            services.AddSingleton<PokemonFinder>();
         }
 
         private void ConfigureRepositories(IServiceCollection services)
         {
-            services.AddScoped<PokemonRepository, PokeApiPokemonRepository>();
+            services.AddSingleton<PokemonRepository, PokeApiPokemonRepository>();
+        }
+
+        private void ConfigureCache(IServiceCollection services)
+        {
+            services.AddMemoryCache();
+        }
+
+        private void ConfigureRabbitServices(IServiceCollection services)
+        {
+            services.AddSingleton<NotifyPokemonOnAddedToFavouriteListener>();
         }
     }
 }

@@ -13,7 +13,8 @@ namespace Pokemons.Pokemons.Api.Converter
                 {
                     Id = pokemon.PokemonId.Id,
                     Name = pokemon.PokemonName.Name,
-                    Types = pokemon.PokemonTypes.Types.Select(s => s.Type)
+                    Types = pokemon.PokemonTypes.Types.Select(s => s.Type),
+                    FavouriteCount = pokemon.PokemonFavouriteCount
                 });
         }
     }

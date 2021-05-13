@@ -8,51 +8,76 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Pokemons.Pokemons.Persistence
 {
     public class PokeApiPokemonRepository : PokemonRepository
     {
-        private const string API_URL = "https://pokeapi.co/api/v2/";
-        private HttpClient _httpClient;
+        private const string ApiUrl = "https://pokeapi.co/api/v2/";
+        private readonly HttpClient _httpClient;
+        private readonly IMemoryCache _memoryCache;
+        private const string CacheKeyPrefix = "pokemon/";
 
-        public PokeApiPokemonRepository()
+        public PokeApiPokemonRepository(IMemoryCache memoryCache)
         {
+            _memoryCache = memoryCache;
             _httpClient = new HttpClient();
         }
 
         public async Task<bool> Exists(PokemonId pokemonId)
         {
-            return (await Find(pokemonId)) != null;
+            return await Find(pokemonId) != null;
         }
 
         public async Task<Pokemon> Find(PokemonId pokemonId)
         {
-            var json = await Request(API_URL + $"pokemon/{pokemonId.Id}");
+            var json = await Request(ApiUrl + $"pokemon/{pokemonId.Id}");
 
             if (json == null) return null;
+
+            var cacheKey = GetCacheKey(pokemonId.Id.ToString());
+
+            _memoryCache.TryGetValue(cacheKey, out Pokemon pokemonInMemory);
 
             return new Pokemon(
                 new PokemonId(int.Parse(json["id"].ToString())),
                 new PokemonName(json["name"].ToString()),
-                new PokemonTypes(json["types"].Values("type").Select(x => new PokemonType(x["name"].ToString())).ToList())
-                );
+                new PokemonTypes(json["types"].Values("type").Select(x => new PokemonType(x["name"].ToString()))
+                    .ToList()), pokemonInMemory?.PokemonFavouriteCount ?? 0
+            );
+        }
+
+        public async Task SaveFavourite(PokemonId pokemonId)
+        {
+            var cacheKey = GetCacheKey(pokemonId.Id.ToString());
+
+            var pokemon = await Find(pokemonId);
+
+            pokemon.PokemonFavouriteCount++;
+
+            _memoryCache.Set(cacheKey, pokemon);
+        }
+
+        private string GetCacheKey(string key)
+        {
+            return CacheKeyPrefix + key;
         }
 
         private async Task<JObject> Request(string url)
         {
             try
             {
-                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
                 using (var response = await _httpClient
-                        .SendAsync(request, HttpCompletionOption.ResponseHeadersRead)
-                        .ConfigureAwait(false))
+                    .SendAsync(request, HttpCompletionOption.ResponseHeadersRead)
+                    .ConfigureAwait(false))
                 {
                     if (response.IsSuccessStatusCode == false)
                     {
                         var message = await response.Content.ReadAsStringAsync();
 
-                        if ((int)response.StatusCode == 404)
+                        if ((int) response.StatusCode == 404)
                         {
                             return null;
                         }

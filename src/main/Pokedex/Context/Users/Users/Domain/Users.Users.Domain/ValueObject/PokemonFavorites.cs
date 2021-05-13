@@ -19,6 +19,8 @@ namespace Users.Users.Domain.ValueObject
             GuardPokemonFavoriteExistsInUser(favorite);
 
             Favorites.Add(favorite);
+            
+            //Lanzar excepcion de dominio.
         }
 
         #region private methods
