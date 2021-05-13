@@ -10,7 +10,7 @@ namespace Pokemons.Pokemons.Domain.Test.Aggregate
         public PokemonId PokemonId { get; set; }
         public PokemonName PokemonName { get; set; }
         public PokemonTypes PokemonTypes { get; set; }
-
+        public PokemonFavouriteCount PokemonFavouriteCount { get; set; }
         public static Pokemon Pokemon()
         {
             return new Pokemon(new PokemonId(PokemonIdMother.Id()),
@@ -19,7 +19,7 @@ namespace Pokemons.Pokemons.Domain.Test.Aggregate
                 {
                     new PokemonType("fire"),
                     new PokemonType("flying"),
-                }));
+                }), new PokemonFavouriteCount(PokemonFavouriteCountMother.Count()));
         }
     }
 }

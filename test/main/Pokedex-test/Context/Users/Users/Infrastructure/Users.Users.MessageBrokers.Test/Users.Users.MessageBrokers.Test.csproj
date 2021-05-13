@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Moq" Version="4.16.1" />
+      <PackageReference Include="xunit.assert" Version="2.4.1" />
+      <PackageReference Include="xunit.extensibility.core" Version="2.4.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Users.Users.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null, ProcessorArchitecture=MSIL">
+        <HintPath>..\..\..\..\..\..\..\..\src\main\Pokedex\Context\Users\Users\Domain\Users.Users.Domain\bin\Debug\net5.0\Users.Users.Domain.dll</HintPath>
+      </Reference>
+      <Reference Include="Users.Users.MessageBrokers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\..\..\..\..\..\..\src\main\Pokedex\Context\Users\Users\Infrastructure\Users.Users.MessageBrokers\bin\Debug\net5.0\Users.Users.MessageBrokers.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>
