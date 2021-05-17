@@ -8,9 +8,10 @@
 * 1. Challenge 1 - Pokemons 
 * 2. Challenge 2 - Pokemon Favorites
 * 3. Challenge 3 - Pokemon Details
-* 3. Folder structuring
-* 4. Install 
-* 5. Results
+* 4. Challenge 4 - Number of favorite times
+* 5. Folder structuring
+* 6. Install 
+* 7. Results
 
 
 # 1. Challenge - Pokemons 1️⃣🤔💭
@@ -109,10 +110,109 @@ Current global project structure:
  <img style="text-align:center" src="images/ddd.PNG" width="25%" height="25%" alt="DDD">
 </p>
 
-# 3. Install 🔧 
+
+# 4. Challenge 2️⃣ - Pokemon Favorites Count👤❤️
+
+### Requirements:
+
+We want to obtain the details of a pokemon based on an ID via HTTP endpoint like in Challenge 1 but we're gonna also to add the number of times that the pokemon has been added as a favorite:
+
+JSON Response:
+* ID
+* Name
+* Types (only names)
+* FavoriteCount
+
+We would like to have distributed microservices NOT a distributed monolite, we're not going to share the same persistence infrastructure and we're going to use a MessageBroker :)
+
+For more info (EVENT DRIVEN ARCHITECTURE):
+      
+https://www.youtube.com/watch?v=V4mjxJ5czog
+
+
+### Design:
+
+We're going to mantain the same structure project but we're going to add:
+
+On module Pokemons :
+    New ObjectValue : PokemonFavouriteCount
+    A new Use case : PokemonAddedToFavouritesNotifier
+    A new Entry Point: NotifyPokemonOnAddedToFavouriteListener
+    A new Implementation in Pokemon repository with a combo of Http and InMemory Repositoryç
+
+On module Users :
+
+    A new folder Shared with:
+        DomainEventBase
+        PokemonFavouriteAddedDomainEvent
+        EventPublisher Interface
+
+    A new infrastructure project with the Implementation of our EventPublisher
+
+  New Services like an EventPublisher
+
+ Here you are a few Captures:
+## Infrastructure Rabbit
+![RABBITMQIMPLEMENTATION](images/infra-rabbit.png)
+
+## Domain Services
+![DomainServices](images/domain-events.png)
+
+## Http and InMemory Repository
+![DomainServices](images/combo-repository-origin.png)
+![DomainServices](images/save-faforite.png)
+
+## New Access point to use case with our Rabbit Listener 
+![DomainServices](images/listener.png)
+
+![DomainServices](images/infra-notifier.png)
+
+## Calling EventPublisher on orquestrator (app service)
+![DomainServices](images/event-publisher-call.png)
+
+## new Use Case
+![DomainServices](images/use-case.png)
+
+
+
+
+# 5. Install 🔧 
+
+*Docker is required at this point so you can get docker here:
+
+```
+https://www.docker.com/products/docker-desktop
+```
+
+After installing you will need to have a RabbitMq Cointainer so run:
+
+```
+docker run -d -p 15672:15672 -p 5672:5672 --hostname pokedex --name pokedex rabbitmq:3-management
+```
+
+then you have to  configure rabbit:
+```
+
+http://localhost:15672
+
+user: guest
+password: guest
+
+```
+
+after this you have to create a virtual host with the name "pokemons" and leave all the default properties except name:
+
+![DomainServices](images/virtual-host.png)
+
+then in section queues add this one with the name "notify_pokemons_on_user_add_favorite" and leave all the default properties except name:
+
+![DomainServices](images/queues.png)
 
 * Dotnet is required to build and run the app, you can downloand from official page (we recommend 5.0):
 https://dotnet.microsoft.com/download/dotnet/5.0
+
+
+###Voilà
 
 ---
 
@@ -215,7 +315,7 @@ cd mdas-api-g3
 ---
 
 
-# 4. Results 📷
+# 6. Results 📷
 
 ## Pokemons Results - Challenge 1
 ## Charizard example 🔥:
@@ -261,3 +361,16 @@ cd mdas-api-g3
 * **Acceptance test:** *.Api.Test
 * **Integration test:** *.Persistence.Test
 * **Unitary testing:** *.Application.Test y *.Domain.Test
+
+
+
+## Pokemons Details  - Challenge 4
+
+## Swagger Pokemons - Api Rest 🌐
+![Swagger Favorite](images/results.PNG)
+
+**Note:**
+Start First Users api
+Then start pokemon details api
+Play!
+
